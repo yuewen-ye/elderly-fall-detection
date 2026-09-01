@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "input_file": "demo/fall_event.mp4",
+    "processing_date": "2026-09-01T08:49:17.288977",
+    "model_version": "1.0",
+    "confidence_threshold": 0.4,
+    "video_fps": 30.0,
+    "video_duration": "00:00:05.333",
+    "total_frames": 160,
+    "resolution": "640x240"
+  },
+  "events": [
+    {
+      "type": "fall",
+      "track_id": 1,
+      "start_frame": 99,
+      "end_frame": 159,
+      "timestamp_start": "00:00:03.300",
+      "timestamp_end": "00:00:05.300",
+      "confidence": 1.0
+    }
+  ],
+  "summary": {
+    "total_falls": 1,
+    "persons_tracked": 2,
+    "processing_time_seconds": 7.8,
+    "interrupted": false
+  }
+}

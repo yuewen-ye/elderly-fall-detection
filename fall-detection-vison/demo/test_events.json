@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "input_file": "/home/server/Downloads/10240439-uhd_4096_2160_25fps.mp4",
+    "processing_date": "2026-04-07T17:36:52.924981",
+    "model_version": "1.0",
+    "confidence_threshold": 0.7,
+    "video_fps": 25.0,
+    "video_duration": "00:00:07.280",
+    "total_frames": 182,
+    "resolution": "4096x2160"
+  },
+  "events": [
+    {
+      "type": "fall",
+      "track_id": 1,
+      "start_frame": 122,
+      "end_frame": 181,
+      "timestamp_start": "00:00:04.880",
+      "timestamp_end": "00:00:07.240",
+      "confidence": 0.998
+    }
+  ],
+  "summary": {
+    "total_falls": 1,
+    "persons_tracked": 2,
+    "processing_time_seconds": 15.1,
+    "interrupted": false
+  }
+}

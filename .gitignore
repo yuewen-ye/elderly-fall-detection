@@ -1,0 +1,28 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Model weights (re-downloadable)
+yolo*.pt
+
+# Video / media (large, regenerable)
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Processing outputs
+fall-detection-vison/output/
+
+# Gradio runtime artifacts
+.gradio/
+
+# Uploaded scratch files
+.dsh-uploads/
+
+# Prototype throwaway outputs
+fall-detection-vison/prototypes/out/
