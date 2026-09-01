@@ -26,9 +26,22 @@
 
 ## 现状
 
-系统已实现（wayfinder 地图 5 个 ticket 全部 resolved，见 `.scratch/elderly-fall-detection/`）：`src/image_detector.py`（图片单帧规则检测）+ `app/app.py`（Gradio 双 Tab，share=True，启动 `venv/Scripts/python.exe app/app.py`）。演示素材在 `fall-detection-vison/demo/`。103 个测试全过，已提交 `0496dcd`。
+系统已实现并推送（`main` 最新提交 `217b1d2`）：
 
-正在进行 UI 体验优化（wayfinder 地图见 `.scratch/gradio-ui-optimization/`）：视频检测检出跌倒事件时自动播放 `app/assets/alert.wav` 并支持手动播放；图片检测结果改用 Markdown 自然语言总结，包含规则触发标签与具体数值。
+- 图片/视频双 Tab Gradio 界面：`app/app.py`，启动命令 `fall-detection-vison/venv/Scripts/python.exe app/app.py`。
+- 视频检测：检出完整跌倒事件后自动播放 `fall-detection-vison/app/assets/alert.wav`，浏览器拦截时可手动点击播放控件。
+- 图片检测：结果用 `gr.Markdown` 展示，包含自然语言结论、规则触发标签（躯干倾斜 / 身体横向展开）与具体数值。
+- 修复了 Gradio 工作线程中 `signal.signal()` 触发的 `ValueError`：`src/pipeline.py` 仅在主线程注册 SIGINT。
+- `pytest -q` 103 通过；验收测试素材与结果见 `test/README.md`。
+
+已关闭的 wayfinder 地图：
+
+- `.scratch/elderly-fall-detection/`：系统初始实现。
+- `.scratch/gradio-ui-optimization/`：UI 体验优化（音频警报 + Markdown 结果）。
+
+## 下一步（未实现）
+
+**实时流持续监控**：当前是“上传文件 → 处理 → 返回”的离线模式。要支持摄像头/RTSP 持续输入、实时报警、外部报警通道，需要生产者-消费者架构、流输入抽象、报警器插件和后台服务化改造。详见最近一次对话中的架构建议。
 
 ## 许可
 
