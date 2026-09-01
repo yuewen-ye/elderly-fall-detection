@@ -20,13 +20,15 @@
 
 ## 环境
 
-- Python 3.12 venv：`fall-detection-vison/venv`。一律用 `venv/bin/python`、`venv/bin/pip`，**绝不装到全局**。
+- Python 3.14 venv：`fall-detection-vison/venv`。在 Windows 下用 `venv/Scripts/python.exe`、`venv/Scripts/pip.exe`，**绝不装到全局**。
 - torch 是 CPU 版（2.13.0+cpu）。**装依赖前先 `df -h`；不要装 CUDA 版 torch**——它的 nvidia 依赖 2G+，本机根分区曾 100% 满并因此安装失败。安装用 `--no-cache-dir`。
 - 推理走 CPU（约 0.14s/帧 @4K）；`--device auto` 在有 GPU 的机器上自动加速。
 
 ## 现状
 
-系统已实现（wayfinder 地图 5 个 ticket 全部 resolved，见 `.scratch/elderly-fall-detection/`）：`src/image_detector.py`（图片单帧规则检测）+ `app/app.py`（Gradio 双 Tab，share=True，启动 `./venv/bin/python app/app.py`）。演示素材在 `fall-detection-vison/demo/`。103 个测试全过，已提交 `0496dcd`。待办：用户现场验收（浏览器上传图片/视频确认效果）。
+系统已实现（wayfinder 地图 5 个 ticket 全部 resolved，见 `.scratch/elderly-fall-detection/`）：`src/image_detector.py`（图片单帧规则检测）+ `app/app.py`（Gradio 双 Tab，share=True，启动 `venv/Scripts/python.exe app/app.py`）。演示素材在 `fall-detection-vison/demo/`。103 个测试全过，已提交 `0496dcd`。
+
+正在进行 UI 体验优化（wayfinder 地图见 `.scratch/gradio-ui-optimization/`）：视频检测检出跌倒事件时自动播放 `app/assets/alert.wav` 并支持手动播放；图片检测结果改用 Markdown 自然语言总结，包含规则触发标签与具体数值。
 
 ## 许可
 

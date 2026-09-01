@@ -3,6 +3,7 @@
 import json
 import logging
 import signal
+import threading
 import time
 from collections.abc import Callable
 from datetime import datetime
@@ -145,9 +146,10 @@ class FallDetectionPipeline:
         self.track_manager.reset()
         self.detector.reset_tracker()
 
-        # Setup signal handler for graceful Ctrl+C
+        # Setup signal handler for graceful Ctrl+C (only possible in main thread)
         original_handler = signal.getsignal(signal.SIGINT)
-        signal.signal(signal.SIGINT, self._handle_interrupt)
+        if threading.current_thread() is threading.main_thread():
+            signal.signal(signal.SIGINT, self._handle_interrupt)
 
         start_time = time.time()
         falls_detected = 0
@@ -353,7 +355,8 @@ class FallDetectionPipeline:
                     writer.__exit__(None, None, None)
 
         finally:
-            signal.signal(signal.SIGINT, original_handler)
+            if threading.current_thread() is threading.main_thread():
+                signal.signal(signal.SIGINT, original_handler)
 
         processing_time = time.time() - start_time
 

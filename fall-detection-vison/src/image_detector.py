@@ -32,6 +32,7 @@ class ImageFallResult:
     confidence: float               # 0.0-1.0
     details: list[str] = field(default_factory=list)  # per-person detail lines
     persons_detected: int = 0
+    persons: list[dict] = field(default_factory=list)  # structured per-person info
 
 
 class ImageFallDetector:
@@ -96,6 +97,7 @@ class ImageFallDetector:
             boxes_xyxy.cpu().numpy() if hasattr(boxes_xyxy, "cpu") else boxes_xyxy
         )
         details: list[str] = []
+        persons: list[dict] = []
         any_fall = False
         max_conf = 0.0
 
@@ -106,6 +108,12 @@ class ImageFallDetector:
             )
             angle_deg = fv.body_angle * 180.0
             label, conf = self._judge(angle_deg, fv.bbox_aspect_ratio)
+
+            triggers: list[str] = []
+            if angle_deg > ANGLE_FALL_THRESHOLD:
+                triggers.append("躯干倾斜")
+            if fv.bbox_aspect_ratio > ASPECT_FALL_THRESHOLD:
+                triggers.append("身体横向展开")
 
             if label == "FALL":
                 any_fall = True
@@ -129,11 +137,21 @@ class ImageFallDetector:
                 f"人{i+1}: {label} 置信度{conf:.0%} | 躯干角度{angle_deg:.0f}° | "
                 f"宽高比{fv.bbox_aspect_ratio:.2f} | 重心高度{fv.cog_height:.2f}"
             )
+            persons.append({
+                "person_id": i + 1,
+                "label": label,
+                "confidence": conf,
+                "angle_deg": angle_deg,
+                "aspect_ratio": fv.bbox_aspect_ratio,
+                "cog_height": fv.cog_height,
+                "triggers": triggers,
+            })
 
         result = ImageFallResult(
             label="FALL" if any_fall else "NORMAL",
             confidence=max_conf,
             details=details,
             persons_detected=len(boxes),
+            persons=persons,
         )
         return result, out
