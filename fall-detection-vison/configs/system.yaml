@@ -1,0 +1,33 @@
+# Fall Detection System Configuration
+
+detection:
+  model_path: "models/exports/yolo11n-pose.onnx"
+  confidence_threshold: 0.3
+  keypoint_confidence: 0.3
+  device: "cpu"
+
+state_machine:
+  smooth_frames: 3
+  fallen_timeout_s: 30.0
+
+alert:
+  warning_timeout_s: 2.0
+  escalation:
+    critical_after_s: 5.0
+    emergency_after_s: 30.0
+
+features:
+  angle_fall_threshold: 45.0
+  aspect_fall_threshold: 1.4
+  detect_confidence: 0.3
+  min_keypoint_conf: 0.3
+
+storage:
+  db_path: "data/events.db"
+  save_screenshots: true
+  screenshot_dir: "data/screenshots"
+
+logging:
+  level: "INFO"
+  detection_log: "data/logs/detection.log"
+  event_log: "data/logs/events.log"

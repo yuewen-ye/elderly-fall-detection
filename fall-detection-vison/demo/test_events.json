@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "input_file": "/home/server/Downloads/10240439-uhd_4096_2160_25fps.mp4",
+    "input_file": "test_video.mp4",
     "processing_date": "2026-04-07T17:36:52.924981",
     "model_version": "1.0",
     "confidence_threshold": 0.7,

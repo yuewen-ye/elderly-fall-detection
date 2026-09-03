@@ -26,6 +26,7 @@ from src.utils import (
     draw_status_bar,
 )
 from src.video_io import VideoReader, VideoWriter, format_timestamp
+from src.state_machine import StateMachineManager
 
 logger = logging.getLogger(__name__)
 
@@ -116,6 +117,11 @@ class FallDetectionPipeline:
         self._fall_sticky: dict[int, int] = {}  # track_id → frame when fall detected
         # Remember fallen person's last bbox for occlusion persistence
         self._fallen_positions: dict[int, tuple] = {}  # track_id → (bbox, last_frame)
+        self.state_machine = StateMachineManager(
+            smooth_frames=3,
+            fallen_timeout_s=30.0,
+        )
+        self._state_transitions: list[dict] = []
 
     def process_video(
         self,
@@ -145,6 +151,11 @@ class FallDetectionPipeline:
         self._fallen_positions.clear()
         self.track_manager.reset()
         self.detector.reset_tracker()
+        self.state_machine = StateMachineManager(
+            smooth_frames=3,
+            fallen_timeout_s=30.0,
+        )
+        self._state_transitions.clear()
 
         # Setup signal handler for graceful Ctrl+C (only possible in main thread)
         original_handler = signal.getsignal(signal.SIGINT)
@@ -204,6 +215,28 @@ class FallDetectionPipeline:
                         seq = self.track_manager.get_sequence(person.track_id)
                         state = "normal"
                         conf = 0.0
+
+                        # Update temporal state machine (independent of LSTM)
+                        transition = self.state_machine.update(
+                            track_id=person.track_id,
+                            frame_num=frame_num,
+                            body_angle=features.body_angle,
+                            aspect_ratio=features.bbox_aspect_ratio,
+                            cog_height=features.cog_height,
+                            vertical_velocity=features.vertical_velocity,
+                            confidence=conf,
+                        )
+                        if transition is not None:
+                            self._state_transitions.append({
+                                "track_id": person.track_id,
+                                "from": transition.from_state.value,
+                                "to": transition.to_state.value,
+                                "frame": frame_num,
+                                "reason": transition.reason,
+                                "features": transition.features,
+                            })
+                            sm = self.state_machine.get_or_create(person.track_id)
+                            transition.alert_level = sm.alert_level
 
                         if seq is not None:
                             state, conf = self._classify(seq)
@@ -373,6 +406,7 @@ class FallDetectionPipeline:
                 "resolution": f"{meta.width}x{meta.height}",
             },
             "events": [e.to_dict() for e in self._all_events],
+            "state_transitions": self._state_transitions,
             "summary": {
                 "total_falls": len(self._all_events),
                 "persons_tracked": len(unique_tracks),
